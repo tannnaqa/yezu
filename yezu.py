@@ -117,6 +117,7 @@ STRING_TO_KIND = {
     "end": Kind.END,
     "if": Kind.IF,
     "then": Kind.THEN,
+    "elif": Kind.ELIF,
     "else": Kind.ELSE,
     "while": Kind.WHILE,
     "do": Kind.DO,
