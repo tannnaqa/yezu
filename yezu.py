@@ -76,6 +76,40 @@ class Scanner:
                     break
             return pos, self.string[start:self.index]
 
+class Kind:
+    def __str__(self):
+        return self.name
+    
+    ILLEGAL = enum.auto()
+    COMMENT = enum.auto()
+    WORD = enum.auto()
+    
+    INTEGER = enum.auto()
+    FLOAT = enum.auto()
+    BOOLEAN = enum.auto()
+    STRING = enum.auto()
+    CHARACTER = enum.auto()
+    
+    FUN = enum.auto()
+    END = enum.auto()
+    IF = enum.auto()
+    THEN = enum.auto()
+    ELSE = enum.auto()
+    WHILE = enum.auto()
+    DO = enum.auto()
+    
+
+class Token:
+    __slots__ = "pos", "kind", "value"
+    
+    def __init__(self, pos, kind, value):
+        self.pos = pos
+        self.kind = kind
+        self.value = value
+    
+    def __repr__(self):
+        return f"Token({self.pos}, {self.kind}, {self.value})"
+
 def main():
     print("[yezu]")
     
