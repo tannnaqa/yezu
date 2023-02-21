@@ -364,9 +364,6 @@ def main():
         program = Parser(Kind.COMMENT.exclude(tokens)).program
         
         print(program)
-        print(program.body)
-        
-        print(DT.INT == DT.ANY)
 
 if __name__ == "__main__":
     main()
