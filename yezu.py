@@ -1,4 +1,5 @@
 import enum
+import re
 import sys
 
 def readfile(path):
@@ -76,7 +77,7 @@ class Scanner:
                     break
             return pos, self.string[start:self.index]
 
-class Kind:
+class Kind(enum.Enum):
     def __str__(self):
         return self.name
     
@@ -97,7 +98,16 @@ class Kind:
     ELSE = enum.auto()
     WHILE = enum.auto()
     DO = enum.auto()
-    
+
+STRING_TO_KIND = {
+    "fun": Kind.FUN,
+    "end": Kind.END,
+    "if": Kind.IF,
+    "then": Kind.THEN,
+    "else": Kind.ELSE,
+    "while": Kind.WHILE,
+    "do": Kind.DO,
+}
 
 class Token:
     __slots__ = "pos", "kind", "value"
@@ -108,7 +118,43 @@ class Token:
         self.value = value
     
     def __repr__(self):
-        return f"Token({self.pos}, {self.kind}, {self.value})"
+        return f"Token({self.pos}, {self.kind}, {self.value!r})"
+
+REGEX_INTEGER = re.compile(r"^-?\d+$")
+REGEX_FLOAT = re.compile(r"^-?\d+\.\d+$")
+REGEX_STRING = re.compile(r"^\"[^\"]*\"$")
+REGEX_CHARACTER = re.compile(r"^\'[^\']\'$")
+REGEX_WORD = re.compile(r"^[^\"\']+$")
+
+def tokenize(pos, string):
+    if REGEX_INTEGER.match(string):
+        return Token(pos, Kind.INTEGER, int(string, base=10))
+    elif REGEX_FLOAT.match(string):
+        return Token(pos, Kind.FLOAT, float(string))
+    elif string in ["true", "false"]:
+        return Token(pos, Kind.BOOLEAN, string == "true")
+    elif REGEX_STRING.match(string):
+        return Token(pos, Kind.STRING, string[1:-1])
+    elif REGEX_CHARACTER.match(string):
+        return Token(pos, Kind.CHARACTER, string[1:-1])
+    elif string in STRING_TO_KIND:
+        return Token(pos, STRING_TO_KIND[string], None)
+    elif string.startswith(";"):
+        return Token(pos, Kind.COMMENT, string[1:])
+    elif REGEX_WORD.match(string):
+        return Token(pos, Kind.WORD, string)
+    else:
+        return Token(pos, Kind.ILLEGAL, string)
+
+class Lexer:
+    def __init__(self, path):
+        self.scanner = Scanner(path)
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        return tokenize(*next(self.scanner))
 
 def main():
     print("[yezu]")
@@ -118,8 +164,8 @@ def main():
         exit()
     else:
         path = sys.argv[1]
-        for word in Scanner(path):
-            print(word)
+        for token in Lexer(path):
+            print(token)
 
 
 if __name__ == "__main__":
