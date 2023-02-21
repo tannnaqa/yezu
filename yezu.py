@@ -80,19 +80,19 @@ class Scanner:
                     break
             return pos, self.string[start:self.index]
 
+def representable(cls):
+    cls.__repr__ = lambda self: self.name
+    cls.__str__ = lambda self: self.name
+    return cls
+
+def siftable(cls):
+    cls.filter = lambda self, iterable: filter(lambda token: token.kind == self, iterable)
+    cls.exclude = lambda self, iterable: filter(lambda token: token.kind != self, iterable)
+    return cls
+
+@representable
+@siftable
 class Kind(enum.Enum):
-    def __repr__(self):
-        return self.name
-    
-    def __str__(self):
-        return self.name
-    
-    def filter(self, iterable):
-        return filter(lambda token: token.kind == self, iterable)
-    
-    def exclude(self, iterable):
-        return filter(lambda token: token.kind != self, iterable)
-    
     ILLEGAL = enum.auto()
     COMMENT = enum.auto()
     WORD = enum.auto()
@@ -330,6 +330,23 @@ class Parser:
         self.expect(Kind.END)
         return While(pos, cond, body)
 
+class Signature:
+    __slots__ = "consume", "produce"
+    
+    def __init__(self, consume, produce):
+        self.consume = tuple(consume)
+        self.produce = tuple(produce)
+    
+    def __iter__(self):
+        return iter((self.consume, self.produce))
+    
+    @property
+    def shape(self):
+        return len(self.consume), len(self.produce)
+    
+    def __repr__(self):
+        return f"{' '.join(map(repr, self.consume))} -- {' '.join(map(repr, self.produce))}"
+
 def main():
     print("[yezu]")
     
@@ -347,6 +364,9 @@ def main():
         program = Parser(Kind.COMMENT.exclude(tokens)).program
         
         print(program)
+        print(program.body)
+        
+        print(DT.INT == DT.ANY)
 
 if __name__ == "__main__":
     main()
