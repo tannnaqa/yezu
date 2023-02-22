@@ -348,6 +348,42 @@ class Signature:
     def __repr__(self):
         return f"{' '.join(map(repr, self.consume))} -- {' '.join(map(repr, self.produce))}"
 
+@representable
+class DT(enum.Enum):
+    INT = enum.auto()
+    FLOAT = enum.auto()
+    BOOL = enum.auto()
+    STR = enum.auto()
+    CHAR = enum.auto()
+
+class Generic:
+    __slots__ = ("name",)
+    
+    def __init__(self):
+        self.name = name
+    
+    def __repr__(self):
+        return f"Generic({self.name})"
+
+BUILTINS = {
+    "+": Signature([DT.INT, DT.INT], [DT.INT]),
+    "-": Signature([DT.INT, DT.INT], [DT.INT]),
+    "*": Signature([DT.INT, DT.INT], [DT.INT]),
+    
+    "=": Signature([DT.INT, DT.INT], [DT.BOOL]),
+    ">": Signature([DT.INT, DT.INT], [DT.BOOL]),
+    "<": Signature([DT.INT, DT.INT], [DT.BOOL]),
+    
+    "println": Signature([Generic("T")], []),
+    
+    "drop": Signature([Generic("T")], []),
+    "dup": Signature([Generic("T"), Generic("T")], [Generic("T")]),
+}
+
+class Checker:
+    def __init__(self, functions=None):
+        self.functions = dict(BUILTINS if functions is None else functions)
+
 def main():
     print("[yezu]")
     
