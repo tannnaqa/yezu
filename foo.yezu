@@ -1,0 +1,35 @@
+34 35 + println
+
+"Hello, world!" println ; classical hello world program
+
+fun pred
+    1 -
+end
+
+fun zero?
+    0 =
+end
+
+fun positive?
+    > 0
+end
+
+fun count-down
+    while positive? do
+        dup println
+        pred
+    end
+    println
+end
+
+10 count-down ; print "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n0\n"
+
+fun factorial
+    if zero? then
+        drop 1
+    else
+        dup pred factorial *
+    end
+end
+
+12 factorial println ; print "479001600\n"
